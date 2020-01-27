@@ -1,0 +1,192 @@
+
+.model small
+.stack 64
+.data
+
+
+
+; menu
+
+spc1 db 13,10,"*********CALCULADORA-JACOB************",'$'
+msgopcion db 13,10, "Elija una opcion ",'$'
+msn db 13,10, " *          Opciones             *",'$'
+oper1 db 13,10, "*         1.Suma                *",'$'
+oper2 db 13,10, "*         2.Resta               *",'$'
+oper3 db 13,10, "*         3.Multiplicacion      *",'$'
+oper4 db 13,10, "*         4.Division            *",'$'
+oper5 db 13,10, "*         5.Salir               *",'$'
+spc2 db 13,10,  "**********************************",'$'
+msn1 db 13,10, "Ingrese primer numero: ",'$'
+msn2 db 13,10, "Ingrese segundo numero: ",'$'
+resu db 13,10, "-----> -----> ---->El resultado es: ",'$'
+
+
+
+;variables que contendran los valores ingresado y los resultados de las opciones
+        num1 db 0    ; varibles inicializadas en zer
+        num2 db 0
+        suma db 0
+        resta db 0
+        multi db 0
+        divi db 0
+
+.code ; segmento codigo, permite el inicio del programa con instrucciones necesarias para la ejecion
+
+operaciones proc far ; se inician procesos del programa con la directiva proc
+
+mov ax,@data
+mov ds,ax
+
+menu: ; etiqueda que termina con dos puntos, contiene los mensajes a mostrar e ingreso de datos
+;pasamos el contenido de la variable spc1- a dx para mostrar en pantalla
+mov ah,09
+lea dx, spc1
+int 21h
+
+
+;;;;;;;;;;;;;;
+
+
+; se cargan los demas mensajes en pantalla
+;carga primer mensaje
+mov ah,09
+lea dx, msn ; ipciones
+int 21h
+
+mov ah,09
+lea dx,oper1
+int 21h
+
+mov ah,09
+lea dx,oper2
+int 21h
+
+mov ah,09
+lea dx,oper3
+int 21h
+
+mov ah,09
+lea dx,oper4
+int 21h
+
+mov ah,09
+lea dx,oper5
+int 21h
+
+mov ah,09
+lea dx,spc2
+int 21h
+
+
+; instrucciones para ingresarl el valor desde el teclado
+
+mov ah,09 ;
+lea dx,msn1
+int 21h
+mov ah,01 ; se carga el servicio 01 permite ingresa un caracter en la parte alta del registro ah
+int 21h ; interrupcion
+sub al,30h ; se resta 30h para convertir el dato ingresado a numero
+mov num1,al ; pasamos el valror de al a variable num1
+int 21h
+;solicitar al usuario el segundo numero
+mov ah,09
+lea dx,msn2
+int 21h
+mov ah,01
+int 21h
+sub al,30h
+mov num2,al
+
+
+comparacion: ;etiqueta terminancon : puntos contiene instrucciones que definen la opcion a seleccionar
+
+mov ah,09
+lea dx, msgopcion
+int 21h
+
+;instrucciones para seleccion de opciones
+mov ah,01
+int 21h
+sub al,30h
+cmp al,1
+je seleccion1
+
+cmp al,2
+je seleccion2
+
+cmp al,3
+je seleccion3
+
+cmp al,4
+je seleccion4
+
+cmp al,5
+je salir
+
+seleccion1: ; etiqueta que contiene las instrucciones correspdnientes a la suma
+   mov al,num1
+   add al, num2
+   mov suma,al
+ 
+   
+   mov ah,09
+   lea dx,resu
+   int 21h
+   
+   mov dl,suma
+   add dl,30h
+   mov ah,02
+   int 21h
+jmp menu ; hace un salto a la etiquets menu
+
+
+seleccion2: ; etiqueta que contiene las instrucciones correspdnientes a la resta
+   mov al,num1
+   sub al, num2
+   mov resta,al
+   mov ah,09
+   lea dx,resu
+   int 21h
+   mov dl,resta
+   add dl,30h
+   mov ah,2
+   int 21h
+jmp menu ; hace un salto a la etiquets menu
+
+    
+seleccion3: ; etiqueta que contiene las instrucciones correspdnientes a la multiplicacoin
+   mov al,num1
+   mul num2
+   mov multi,al
+   mov ah,09
+   lea dx,resu
+   int 21h
+   mov dl,multi
+   add dl,30h
+   mov ah,02
+   int 21h
+jmp menu ; hace un salto a la etiquets menu
+   
+seleccion4: ; etiqueta que contiene las instrucciones correspdnientes a la divisio
+   mov AX,0000H
+   mov al,num1
+   div num2
+   mov divi,al
+   mov ah,09
+   lea dx,resu
+   int 21h
+   mov dl,divi
+   add dl,30h
+   mov ah,2
+   int 21h
+jmp menu ; hace un salto a la etiquets menu
+
+
+salir: ; etiqueta que contiene las instrucciones para salir
+mov ax,4c00h
+int 21h
+
+
+
+operaciones endp
+end operaciones
